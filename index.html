@@ -128,7 +128,7 @@
     </main>
     <script type="module">
       import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
-      import {GoogleAuthProvider, getAuth, getIdTokenResult, onAuthStateChanged, signInWithRedirect, signOut} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+      import {GoogleAuthProvider, getAuth, getIdTokenResult, getRedirectResult, onAuthStateChanged, signInWithRedirect, signOut} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
       import {getFirestore, onSnapshot, doc} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
       import {connectFunctionsEmulator, getFunctions, httpsCallable} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js';
 
@@ -217,7 +217,9 @@
       $('sign-out').onclick=()=>signOut(auth);
       function setLocked(locked){document.body.classList.toggle('is-locked',locked);document.body.classList.toggle('is-unlocked',!locked);$('console').setAttribute('aria-hidden',String(locked));$('console').toggleAttribute('inert',locked);}
       let unsubs=[];function clearSubscriptions(){unsubs.forEach(unsub=>unsub());unsubs=[];}
-      onAuthStateChanged(auth,async user=>{clearSubscriptions();$('sign-out').classList.toggle('hidden',!user);if(!user){$('auth-dot').classList.remove('ok');$('auth-status').textContent='로그인 필요';setLocked(true);status('로그인 후 공지와 점검 상태를 확인하고 설정할 수 있습니다.');return;}const token=await getIdTokenResult(user,true);$('auth-dot').classList.add('ok');$('auth-status').textContent='로그인됨';if(token.claims.operationsAdmin!==true){setLocked(true);status('이 계정에는 운영자 권한이 없습니다. 운영자 계정으로 다시 로그인해 주세요.');return;}manualPanelSelection=false;selectedPanel=null;setLocked(false);status('테스트 Firebase 공지를 불러오는 중입니다.');for(const kind of ['notice','maintenance'])unsubs.push(onSnapshot(doc(db,'platformAnnouncements',kind),snapshot=>{if(snapshot.exists())state[kind]={...defaults[kind],...snapshot.data(),localized:{...defaults[kind].localized,...snapshot.data().localized}};if(!manualPanelSelection)selectedPanel=null;renderAll();status('테스트 Firebase와 동기화되었습니다.');},error=>status(`공지 데이터를 읽지 못했습니다: ${error.message ?? error}`)));});
+      let redirectFailure = null;
+      try { await getRedirectResult(auth); } catch (error) { const code=typeof error?.code==='string'?` (${error.code})`:''; redirectFailure=`Google 로그인에 실패했습니다${code}: ${error?.message ?? error}`; }
+      onAuthStateChanged(auth,async user=>{clearSubscriptions();$('sign-out').classList.toggle('hidden',!user);if(!user){$('auth-dot').classList.remove('ok');$('auth-status').textContent='로그인 필요';setLocked(true);status(redirectFailure ?? '로그인 후 공지와 점검 상태를 확인하고 설정할 수 있습니다.');return;}const token=await getIdTokenResult(user,true);$('auth-dot').classList.add('ok');$('auth-status').textContent='로그인됨';if(token.claims.operationsAdmin!==true){setLocked(true);status('이 계정에는 운영자 권한이 없습니다. 운영자 계정으로 다시 로그인해 주세요.');return;}manualPanelSelection=false;selectedPanel=null;setLocked(false);status('테스트 Firebase 공지를 불러오는 중입니다.');for(const kind of ['notice','maintenance'])unsubs.push(onSnapshot(doc(db,'platformAnnouncements',kind),snapshot=>{if(snapshot.exists())state[kind]={...defaults[kind],...snapshot.data(),localized:{...defaults[kind].localized,...snapshot.data().localized}};if(!manualPanelSelection)selectedPanel=null;renderAll();status('테스트 Firebase와 동기화되었습니다.');},error=>status(`공지 데이터를 읽지 못했습니다: ${error.message ?? error}`)));});
       renderAll();
     </script>
   </body>
