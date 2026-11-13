@@ -127,7 +127,7 @@
     </main>
     <script type="module">
       import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
-      import {GoogleAuthProvider, getAuth, getIdTokenResult, onAuthStateChanged, signInWithPopup, signOut} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+      import {GoogleAuthProvider, getAuth, getIdTokenResult, onAuthStateChanged, signInWithRedirect, signOut} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
       import {getFirestore, onSnapshot, doc} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
       import {connectFunctionsEmulator, getFunctions, httpsCallable} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js';
 
@@ -195,7 +195,7 @@
       function syncFromInputs(kind){const fields=edit(kind), current=copy(kind);current.title=fields.title.value;current.body=fields.body.value;state[kind].active=fields.active.checked;if(fields.period)state[kind].maintenancePeriod=fields.period.value;render(kind);renderCampaignList();}
       document.querySelectorAll('input,textarea').forEach(field=>field.addEventListener('input',()=>{const kind=field.id.startsWith('maintenance')?'maintenance':'notice';syncFromInputs(kind)}));
       document.querySelectorAll('.save').forEach(button=>button.addEventListener('click',async()=>{const kind=button.dataset.kind;syncFromInputs(kind);const value=state[kind];for(const [locale] of locales){const c=value.localized[locale];if(!c?.title.trim()||!c?.body.trim()){status(`${locale} 제목과 본문을 모두 입력해 주세요.`);return;}}if(kind==='maintenance'&&value.active&&!value.maintenancePeriod.trim()){status('점검 모드를 켜려면 점검 시간을 입력해 주세요.');return;}button.disabled=true;try{await callUpdate({kind,active:value.active,localized:value.localized,maintenancePeriod:kind==='maintenance'?value.maintenancePeriod:null});status(`${kind==='notice'?'최근 공지':'서버 점검'} 설정을 저장했습니다. 앱에 실시간 반영됩니다.`);}catch(error){status(`저장하지 못했습니다: ${error.message ?? error}`);}finally{button.disabled=false;}}));
-      async function requestSignIn(){try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(error){const code=typeof error?.code==='string'?` (${error.code})`:'';status(`로그인하지 못했습니다${code}: ${error?.message ?? error}`);}}
+      async function requestSignIn(){try{status('Google 로그인 페이지로 이동합니다. 로그인이 끝나면 이 운영 콘솔로 돌아옵니다.');await signInWithRedirect(auth,new GoogleAuthProvider());}catch(error){const code=typeof error?.code==='string'?` (${error.code})`:'';status(`로그인하지 못했습니다${code}: ${error?.message ?? error}`);}}
       $('sign-in').onclick=requestSignIn; $('sign-in-gate').onclick=requestSignIn;
       $('sign-out').onclick=()=>signOut(auth);
       function setLocked(locked){document.body.classList.toggle('is-locked',locked);document.body.classList.toggle('is-unlocked',!locked);$('console').setAttribute('aria-hidden',String(locked));$('console').toggleAttribute('inert',locked);}
