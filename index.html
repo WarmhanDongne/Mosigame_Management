@@ -57,6 +57,7 @@
       .campaign-heading { display:flex; justify-content:space-between; gap:14px; padding:24px 23px 18px; border-bottom:1px solid #d9d1b8; }.campaign-heading h2 { margin:2px 0 0; font-size:1.5rem; letter-spacing:-.06em; }.campaign-heading p:not(.eyebrow) { margin:7px 0 0; color:var(--muted); font-size:.8rem; line-height:1.5; }.campaign-heading>span { align-self:start; border:1px solid #6a8638; border-radius:999px; background:#e0efbd; color:#375923; padding:5px 8px; font:900 .65rem/1 ui-monospace,SFMono-Regular,monospace; letter-spacing:.11em; }
       .campaign-list { display:grid; padding:7px 14px 14px; }.campaign-item { width:100%; display:grid; grid-template-columns:12px minmax(0,1fr) auto; align-items:center; gap:10px; padding:16px 9px; border:0; border-bottom:1px solid #e3decf; border-radius:0; box-shadow:none; background:transparent; text-align:left; }.campaign-item:last-child { border-bottom:0; }.campaign-item:hover,.campaign-item.is-selected { transform:none; box-shadow:none; background:#eef5dc; }.campaign-item:focus-visible { outline:3px solid #7052ed; outline-offset:2px; }.campaign-dot { width:9px; height:9px; border-radius:50%; background:#b7b7b7; }.campaign-dot.is-active { background:#77ad42; }.campaign-dot.is-pending { background:#d09b32; }.campaign-item strong { display:block; color:var(--line); font-size:.88rem; }.campaign-item small { display:block; margin-top:3px; color:#706c65; font-size:.7rem; line-height:1.4; }.campaign-state { color:#516a33; font:900 .65rem/1.3 ui-monospace,SFMono-Regular,monospace; text-align:right; }.campaign-state.off { color:#8a8176; }.campaign-state.pending { color:#a06f23; }
       .editor-panel { min-width:0; }.editor-card { min-height:625px; padding:27px; }.editor-card[hidden] { display:none; }.editor-card::before { width:95px; height:9px; }.editor-card .desc { max-width:660px; }.alert-editor { display:grid; align-content:start; gap:9px; }.alert-state { display:grid; gap:7px; margin-top:28px; padding:20px; border:2px dashed #a99669; border-radius:10px; background:#f8f3e3; }.alert-state b { color:#49652d; font-size:.7rem; letter-spacing:.1em; }.alert-state strong { font-size:1.25rem; }.alert-state span { color:#68635a; font-size:.82rem; }
+      .console-wrap { margin-top:0; }.console-status { min-height:0; margin:0 0 14px; padding:11px 13px; border:1px dashed #80944d; border-radius:9px; background:#f1edda; color:#4f573c; font-size:.78rem; line-height:1.45; }.campaign-sign-out { flex:none; align-self:start; padding:7px 9px; font-size:.67rem; box-shadow:2px 2px 0 var(--line); }
       .login-gate { position:absolute; z-index:5; inset:0; display:grid; place-items:center; padding:24px; border-radius:13px; background:rgb(96 71 240 / .28); }.login-card { width:min(390px,100%); padding:29px 28px; border:3px solid var(--line); border-radius:13px; background:#fffdf8; box-shadow:9px 10px 0 var(--line); text-align:center; }.login-card p { margin:12px 0 5px; color:#49652d; font:900 .7rem/1 ui-monospace,SFMono-Regular,monospace; letter-spacing:.14em; }.login-card h1 { margin:0; color:var(--line); font-size:1.75rem; letter-spacing:-.06em; }.login-card>span:not(.login-mark) { display:block; margin:11px 0 22px; color:#68635a; font-size:.83rem; line-height:1.55; }.login-card button { width:100%; }.login-mark { display:inline-grid; place-items:center; width:42px; height:42px; border:3px solid var(--line); border-radius:11px; background:var(--lime); color:var(--line); font-size:1.2rem; font-weight:950; }
       .is-locked #console { filter:blur(10px); opacity:.62; pointer-events:none; user-select:none; }.is-locked #login-gate { display:grid; }.is-unlocked #login-gate { display:none; }.is-unlocked #console { filter:none; opacity:1; pointer-events:auto; user-select:auto; }
       @media (max-width:850px) { .console-layout { grid-template-columns:1fr; }.campaign-panel { position:static; }.campaign-list { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }.campaign-item { min-height:95px; grid-template-columns:10px minmax(0,1fr); align-content:start; border:1px solid #e3decf; border-radius:8px; }.campaign-state { grid-column:2; text-align:left; }.console-wrap { min-height:735px; } }
@@ -65,23 +66,15 @@
   </head>
   <body class="is-locked">
     <main>
-      <header>
-        <div class="brand">모시겜 <small>ALERT OPERATIONS · TEST</small></div>
-        <div>
-          <span class="badge"><i id="auth-dot" class="dot"></i><span id="auth-status">로그인 필요</span></span>
-          <button id="sign-in" class="primary hidden" type="button">Google로 로그인</button>
-          <button id="sign-out" class="hidden" type="button">로그아웃</button>
-        </div>
-      </header>
-
-      <p id="status" class="status">로그인 후 공지와 점검 상태를 확인하고 설정할 수 있습니다.</p>
+      <div hidden aria-hidden="true"><i id="auth-dot" class="dot"></i><span id="auth-status">로그인 필요</span><button id="sign-in" type="button">Google로 로그인</button></div>
       <div id="console-wrap" class="console-wrap">
         <section id="console" class="console-layout" aria-label="공지 운영 콘솔" aria-hidden="true" inert>
           <aside class="campaign-panel">
-            <div class="campaign-heading"><div><p class="eyebrow">LIVE STATUS</p><h2>운영 목록</h2><p>공지, 점검, 알림 상태를 우선순위 순서로 확인합니다.</p></div><span>TEST</span></div>
+            <div class="campaign-heading"><div><p class="eyebrow">LIVE STATUS</p><h2>운영 목록</h2><p>공지, 점검, 알림 상태를 우선순위 순서로 확인합니다.</p></div><button id="sign-out" class="campaign-sign-out hidden" type="button">로그아웃</button></div>
             <div id="campaign-list" class="campaign-list" aria-label="운영 항목 목록"></div>
           </aside>
           <div class="editor-panel">
+        <p id="status" class="console-status" role="status">로그인 후 공지와 점검 상태를 확인하고 설정할 수 있습니다.</p>
         <article id="notice-editor" class="card editor-card">
           <p class="eyebrow">A · LATEST NOTICE</p>
           <h2>최근 공지</h2>
