@@ -1,15 +1,19 @@
 # Mosigame Management
 
-Mosigame의 공지·점검 관리용 정적 웹 콘솔입니다.
+Mosigame의 공지·점검·TEST 푸시 알림 관리용 정적 웹 콘솔입니다.
 
 ## 제공 범위
 
 - 최근 공지(A)와 서버 점검(B)의 다국어 내용·표시 여부 관리
+- 최근 60일 안에 등록된 TEST 휴대폰 전체에 다국어 푸시 알림 발송
+- 발송 성공·실패 기기 수와 최근 이력 확인
 - Firebase Authentication Google 로그인
 - Firebase Custom Claim `operationsAdmin`을 가진 사용자만 저장 가능
 - 대상 Firebase: **`ban-pick-simulator` 테스트 프로젝트**
 
-일반 푸시 알림(FCM)은 아직 이 콘솔에서 발송하지 않습니다.
+푸시 발송은 `sendOperationsPushNotification` callable이 TEST 프로젝트 여부와
+`operationsAdmin` 권한을 다시 검사한 뒤 실행합니다. 기기 토큰은 화면과 발송
+이력에 저장하거나 노출하지 않습니다.
 
 ## 배포
 
